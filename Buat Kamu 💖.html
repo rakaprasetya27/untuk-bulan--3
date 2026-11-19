@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Buat Kamu 💖</title>
+<style>
+:root{color-scheme:light;--bg:#ffe4ec;--card:#fff;--ink:#4a2338;--accent:#ff5c8a;--soft:#ffc2d6;--on:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#2a1420;--card:#3b1d2d;--ink:#ffe4ec;--accent:#ff6f98;--soft:#5a2a41;--on:#2a1420}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#2a1420;--card:#3b1d2d;--ink:#ffe4ec;--accent:#ff6f98;--soft:#5a2a41;--on:#2a1420}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Nunito","Trebuchet MS",system-ui,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:16px}
+#app{background:var(--card);border-radius:28px;padding:28px 22px;max-width:420px;width:100%;text-align:center;box-shadow:0 10px 30px rgba(255,92,138,.25);position:relative}
+h1{font-size:1.5rem;margin:.4em 0}
+p{line-height:1.5;margin:.5em 0}
+.big{font-size:6.5rem;line-height:1.1;display:inline-block;user-select:none}
+.bob{animation:bob 1.4s ease-in-out infinite}
+.pop{animation:pop .35s ease}
+.sob{animation:sob .5s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-14px) rotate(4deg)}}
+@keyframes pop{0%{transform:scale(.7)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+@keyframes sob{0%,100%{transform:translateX(-3px)}50%{transform:translateX(3px)}}
+@keyframes up{from{transform:translateY(0) scale(.6);opacity:1}to{transform:translateY(-70vh) scale(1.6);opacity:0}}
+@keyframes fall{from{transform:translateY(-10vh) rotate(0);opacity:1}to{transform:translateY(110vh) rotate(540deg);opacity:.8}}
+.btn{font:inherit;font-weight:800;font-size:1.05rem;border:0;border-radius:999px;padding:14px 26px;margin:8px 6px;cursor:pointer;background:var(--accent);color:var(--on);transition:transform .15s}
+.btn:active{transform:scale(.94)}
+.btn.ghost{background:var(--soft);color:var(--ink)}
+.choice{display:block;width:100%;margin:10px 0;text-align:left;background:var(--soft);color:var(--ink)}
+.meter{height:16px;background:var(--soft);border-radius:99px;overflow:hidden;margin:14px 0}
+.meter i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .4s}
+.line{min-height:3.2em;font-weight:700}
+.hint{font-size:.9rem;opacity:.8;min-height:1.4em}
+.coupon{border:3px dashed var(--accent);border-radius:18px;padding:14px;margin:14px 0;font-weight:800}
+.coupon small{display:block;font-weight:400;opacity:.85;margin-top:6px}
+.fx{position:fixed;pointer-events:none;z-index:9;font-size:2rem}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+var NAMA = "Sayang ku bulan"; // ganti dengan nama panggilannya
+var app = document.getElementById("app");
+var faces = ["😭","😢","🥺","😒","🙂","😊","😄","🥰"];
+var lines = [
+ "Peluk virtual terkirim 🤗 (gratis ongkir)",
+ "Pipi kamu kalau cemberut mirip bakpao. Pengen aku cubit 🥟",
+ "Aku lagi nego sama mood jelek: “Pergi dong, jangan ganggu pacarku”",
+ "Kalau kamu senyum, wifi di hatiku langsung full bar 📶",
+ "Peringatan: ngambek kamu tetap lucu, jadi nggak efektif 😤",
+ "Mood jelek mulai kabur sambil bawa koper 🧳",
+ "Sedikit lagi… itu ujung bibir kamu mau naik, kan? 👀",
+ "Sekali lagi! Pencet! Pencet! 🥹"
+];
+var n = 0, tries = 0;
+
+function fx(emoji, x, y, anim, dur){
+  var s = document.createElement("span");
+  s.className = "fx"; s.textContent = emoji;
+  s.style.left = x + "px"; s.style.top = y + "px";
+  s.style.animation = anim + " " + dur + "s ease-out forwards";
+  document.body.appendChild(s);
+  setTimeout(function(){ s.remove(); }, dur * 1000 + 100);
+}
+function burst(list, count){
+  for (var i = 0; i < count; i++){
+    fx(list[i % list.length], Math.random() * (innerWidth - 40), innerHeight - 80, "up", 1.2 + Math.random());
+  }
+}
+
+function intro(){
+  n = 0; tries = 0;
+  app.innerHTML = '<div class="big sob">🥺</div><h1>Halo, ' + NAMA + '!</h1>' +
+    '<p>Aku lagi bikin game kecil khusus buat kamu. Mau main sebentar?</p>' +
+    '<div><button class="btn" id="yes">Mau dong 💖</button><button class="btn ghost" id="no">Nggak</button></div>' +
+    '<p class="hint" id="hint"></p>';
+  var hints = ["Eits, tombolnya malu 🙈","Kok kabur terus sih 😆","Udah, pencet yang pink aja 💖","Dia capek lari. Kasihan 🥲"];
+  var no = document.getElementById("no");
+  document.getElementById("yes").onclick = hug;
+  function run(e){
+    if (tries >= 5){ no.textContent = "Ya udah, mau"; no.style.position = "static"; no.onclick = hug; return; }
+    e.preventDefault();
+    tries++;
+    no.style.position = "fixed";
+    no.style.left = (8 + Math.random() * (innerWidth - 130)) + "px";
+    no.style.top = (8 + Math.random() * (innerHeight - 70)) + "px";
+    document.getElementById("hint").textContent = hints[(tries - 1) % hints.length];
+  }
+  no.addEventListener("pointerenter", run);
+  no.addEventListener("touchstart", run);
+  no.onclick = run;
+}
+
+function hug(){
+  app.innerHTML = '<p class="hint">Mood ' + NAMA + ' saat ini:</p>' +
+    '<div class="big" id="face">' + faces[0] + '</div>' +
+    '<div class="meter"><i id="bar"></i></div>' +
+    '<p class="line" id="line">Aduh, Incess satu ini kayaknya butuh banyak pelukan nih…</p>' +
+    '<button class="btn" id="send">Kirim peluk 🤗</button>';
+  var face = document.getElementById("face");
+  face.classList.add("sob");
+  document.getElementById("send").onclick = function(){
+    n++;
+    face.textContent = faces[Math.min(n, faces.length - 1)];
+    face.className = "big pop";
+    document.getElementById("bar").style.width = (n / 8 * 100) + "%";
+    document.getElementById("line").textContent = lines[n - 1];
+    burst(["💖","💕","🤗","🧸","✨"], 6);
+    if (n >= 8){
+      document.getElementById("send").disabled = true;
+      setTimeout(choose, 1100);
+    }
+  };
+}
+
+function choose(){
+  app.innerHTML = '<div class="big bob">🧸</div><h1>Level selesai!</h1>' +
+    '<p>Sekarang pilih satu kupon traktiran dari aku 🎟️</p><div id="opts"></div>';
+  var opts = ["🧋 Traktir boba","🍜 Traktir makanan favorit kamu","💆 Pijit 10 menit tanpa protes","🎬 Nonton film pilihan kamu, aku dilarang komplain"];
+  opts.forEach(function(o){
+    var b = document.createElement("button");
+    b.className = "btn choice"; b.textContent = o;
+    b.onclick = function(){ finale(o); };
+    document.getElementById("opts").appendChild(b);
+  });
+}
+
+function finale(c){
+  app.innerHTML = '<div class="big bob">🥰</div><h1>Misi berhasil! 🎉</h1>' +
+    '<p>Senyum ' + NAMA + ' sudah terdeteksi (aku lihat kok 😝)</p>' +
+    '<div class="coupon">🎟️ KUPON: ' + c + '<small>Berlaku seumur hidup. Tidak bisa diuangkan. Tidak boleh ditolak 😤</small></div>' +
+    '<p>Maaf ya kalau aku bikin kamu bete. Aku sayang kamu 💕</p>' +
+    '<button class="btn ghost" id="again">Main lagi 🔁</button>';
+  document.getElementById("again").onclick = intro;
+  var em = ["🎉","💖","✨","🧸","🌸","💕"];
+  for (var i = 0; i < 36; i++){
+    fx(em[i % em.length], Math.random() * (innerWidth - 30), -30, "fall", 2.5 + Math.random() * 2);
+  }
+}
+intro();
+</script>
+</body>
+</html>
